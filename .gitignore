@@ -11,3 +11,6 @@ data/app/*.db
 .coverage
 htmlcov/
 .DS_Store
+*.egg-info/
+build/
+dist/

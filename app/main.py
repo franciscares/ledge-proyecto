@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.api.routes_debug import router as debug_router
 from app.config import get_settings
 from app.db import apply_migrations
 
@@ -23,3 +24,6 @@ def health() -> dict[str, str]:
         "status": "ok",
         "environment": settings.app_env,
     }
+
+
+app.include_router(debug_router)
