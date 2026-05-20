@@ -118,3 +118,13 @@ Ejemplo:
   "output_count": 10,
   "exception_count": 0
 }
+```
+
+## API
+
+La API expone una superficie read-only para revisión y un endpoint controlado para disparar reingestas.
+
+Todos los endpoints, excepto `/health`, requieren:
+
+```bash
+X-API-Key: dev-api-key

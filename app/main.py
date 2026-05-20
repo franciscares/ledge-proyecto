@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 
-from app.api.routes_debug import router as debug_router
 from app.config import get_settings
 from app.db import apply_migrations
 from app.api.routes_ingestions import router as ingestions_router
@@ -35,7 +34,6 @@ def health() -> dict[str, str]:
     }
 
 
-app.include_router(debug_router)
 app.include_router(ingestions_router)
 app.include_router(orders_router)
 app.include_router(exceptions_router)
