@@ -1,12 +1,17 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from app.api.auth import require_api_key
 from app.pipeline.normalize import normalize_orders
 from app.repositories.northwind_reader import fetch_raw_order_lines, fetch_raw_orders
 from app.pipeline.consistency import run_consistency_checks
 from app.pipeline.dedupe import dedupe_orders
 from app.pipeline.dedupe import canonical_order_hash, dedupe_orders
 
-router = APIRouter(prefix="/debug", tags=["debug"])
+router = APIRouter(
+    prefix="/debug",
+    tags=["debug"],
+    dependencies=[Depends(require_api_key)],
+)
 
 
 @router.get("/northwind/orders")

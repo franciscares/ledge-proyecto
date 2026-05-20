@@ -82,3 +82,39 @@ La estrategia es:
 - `natural_key` existente con distinto `content_hash`: actualizar dentro de una transacción o registrar conflicto, según la etapa de persistencia.
 
 Dentro de una misma corrida, el pipeline elimina duplicados exactos y envía a excepciones los duplicados con misma clave natural pero distinto contenido.
+
+## Autenticación
+
+La API usa una API key simple por header:
+
+```bash
+X-API-Key: dev-api-key
+```
+Ejemplo:
+```bash
+curl -H "X-API-Key: dev-api-key" http://localhost:8000/orders
+```
+
+En local, el valor se configura mediante API_KEY en .env. El archivo .env.example documenta la variable, pero .env no se sube al repositorio.
+
+## Logs estructurados
+
+El servicio emite logs en formato JSON por stdout. Cada corrida de ingesta genera un `correlation_id` que se propaga por las etapas principales del pipeline:
+
+- `ingest`
+- `normalize`
+- `dedupe`
+- `consistency-checks`
+- `persist`
+
+Ejemplo:
+
+```json
+{
+  "event": "pipeline_stage_completed",
+  "correlation_id": "9ef...",
+  "stage": "dedupe",
+  "input_count": 10,
+  "output_count": 10,
+  "exception_count": 0
+}
