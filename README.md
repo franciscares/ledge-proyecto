@@ -21,3 +21,47 @@ La fuente obligatoria es una referencia fija de Northwind SQLite:
 ```bash
 ./scripts/download_northwind.sh
 ./scripts/verify_northwind.sh
+```
+## Modelo canónico
+
+El pipeline transforma los datos crudos de Northwind en un modelo canónico propio compuesto por `CanonicalOrder` y `CanonicalOrderLine`.
+
+Ejemplo:
+
+```json
+{
+  "natural_key": "northwind:10248",
+  "source_order_id": 10248,
+  "customer_id": "VINET",
+  "customer_name": "Vins et alcools Chevalier",
+  "order_date": "1996-07-04",
+  "required_date": "1996-08-01",
+  "shipped_date": "1996-07-16",
+  "status": "shipped",
+  "currency": "USD",
+  "freight_amount": "32.38",
+  "subtotal_amount": "266.00",
+  "discount_amount": "0.00",
+  "total_amount": "298.38",
+  "lines": [
+    {
+      "natural_line_key": "northwind:10248:11",
+      "product_id": 11,
+      "product_name": "Queso Cabrales",
+      "quantity": 12,
+      "unit_price": "14.00",
+      "discount_rate": "0.00",
+      "line_subtotal": "168.00",
+      "line_discount": "0.00",
+      "line_total": "168.00"
+    }
+  ]
+}
+```
+
+Decisiones:
+- Se usa `Decimal` para montos.
+- Se usa `date` para fechas.
+- La moneda se fija como `USD` porque Northwind no provee moneda explícita.
+- `freight_amount` vive a nivel orden y no en líneas.
+- `status` se deriva de `shipped_date`.
