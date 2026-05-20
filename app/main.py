@@ -8,21 +8,23 @@ from app.api.routes_exceptions import router as exceptions_router
 from app.api.routes_ingestion_runs import router as ingestion_runs_router
 from app.api.routes_orders import router as orders_router
 from app.logging_config import configure_logging
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    apply_migrations()
+    yield
 
 settings = get_settings()
-
 app = FastAPI(
     title="Northwind Canonical Orders Pipeline",
     version="0.1.0",
     description="Pipeline service for canonical order ingestion from Northwind SQLite.",
+    lifespan=lifespan,
 )
 
 configure_logging()
-
-
-@app.on_event("startup")
-def startup() -> None:
-    apply_migrations()
 
 
 @app.get("/health")
