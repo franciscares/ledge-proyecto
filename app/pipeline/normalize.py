@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -71,10 +71,18 @@ def derive_status(shipped_date: Any) -> OrderStatus:
 
 
 def parse_date(value: Any) -> date:
+    if isinstance(value, datetime):
+        return value.date()
+
     if isinstance(value, date):
         return value
 
-    return date.fromisoformat(str(value))
+    value_as_string = str(value)
+
+    try:
+        return date.fromisoformat(value_as_string)
+    except ValueError:
+        return datetime.fromisoformat(value_as_string).date()
 
 
 def parse_optional_date(value: Any) -> date | None:

@@ -92,3 +92,33 @@ def test_normalize_pending_order_when_shipped_date_is_null():
     assert orders[0].lines[0].line_subtotal == Decimal("36.00")
     assert orders[0].lines[0].line_discount == Decimal("3.60")
     assert orders[0].lines[0].line_total == Decimal("32.40")
+
+
+def test_normalize_accepts_datetime_string_as_date():
+    raw_orders = [
+        {
+            "OrderID": 20000,
+            "CustomerID": "ALFKI",
+            "CustomerName": "Alfreds Futterkiste",
+            "OrderDate": "2023-08-29 09:23:46",
+            "RequiredDate": "2023-09-05 09:23:46",
+            "ShippedDate": None,
+            "Freight": 10,
+        }
+    ]
+
+    raw_lines = [
+        {
+            "OrderID": 20000,
+            "ProductID": 1,
+            "ProductName": "Chai",
+            "UnitPrice": 18,
+            "Quantity": 2,
+            "Discount": 0,
+        }
+    ]
+
+    orders = normalize_orders(raw_orders, raw_lines)
+
+    assert orders[0].order_date == date(2023, 8, 29)
+    assert orders[0].required_date == date(2023, 9, 5)

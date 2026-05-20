@@ -65,3 +65,7 @@ Decisiones:
 - La moneda se fija como `USD` porque Northwind no provee moneda explícita.
 - `freight_amount` vive a nivel orden y no en líneas.
 - `status` se deriva de `shipped_date`.
+
+## Supuestos:
+- Las órdenes con inconsistencias de negocio no se persisten como confirmadas; se envían a la cola de excepciones.
+- Northwind contiene fechas en formatos date y datetime. El modelo canónico conserva solo la fecha porque el dominio pedido es Orden/Línea y no requiere granularidad horaria.

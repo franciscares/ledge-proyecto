@@ -93,3 +93,13 @@ def money(value: Decimal) -> Decimal:
     Decimal and quantize them to make totals deterministic.
     """
     return Decimal(value).quantize(Decimal("0.01"))
+
+
+class PipelineException(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    natural_key: str | None = None
+    stage: str
+    reason_code: str
+    message: str
+    payload: dict
