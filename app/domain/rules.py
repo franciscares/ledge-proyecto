@@ -76,6 +76,7 @@ def run_business_rules(order: CanonicalOrder) -> list[PipelineException]:
         check_required_date_not_before_order_date,
         check_shipped_date_not_before_order_date,
         check_freight_is_not_negative,
+        check_freight_too_high_vs_items,
     ]
 
     for rule in single_result_rules:
@@ -86,3 +87,26 @@ def run_business_rules(order: CanonicalOrder) -> list[PipelineException]:
     exceptions.extend(check_high_discount(order))
 
     return exceptions
+
+
+def check_freight_too_high_vs_items(order: CanonicalOrder) -> PipelineException | None:
+    if order.lines_total_amount == 0:
+        return None
+
+    freight_ratio = order.freight_amount / order.lines_total_amount
+
+    if freight_ratio > 0.5:
+        return PipelineException(
+            natural_key=order.natural_key,
+            stage="consistency-checks",
+            reason_code="FREIGHT_TOO_HIGH_VS_ITEMS",
+            message="Freight amount is greater than 50% of the order items total.",
+            payload={
+                "natural_key": order.natural_key,
+                "freight_amount": str(order.freight_amount),
+                "lines_total_amount": str(order.lines_total_amount),
+                "freight_ratio": str(freight_ratio),
+            },
+        )
+
+    return None

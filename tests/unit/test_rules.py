@@ -68,3 +68,32 @@ def test_valid_order_has_no_exceptions():
     exceptions = run_business_rules(order)
 
     assert exceptions == []
+
+
+def test_freight_too_high_vs_items_is_exception():
+    order = CanonicalOrder(
+        natural_key="northwind:freight-high",
+        source_order_id=999,
+        customer_id="TEST",
+        customer_name="Test Customer",
+        order_date=date(1996, 7, 4),
+        required_date=date(1996, 8, 1),
+        shipped_date=date(1996, 7, 16),
+        status=OrderStatus.SHIPPED,
+        freight_amount=Decimal("100.00"),
+        lines=[
+            CanonicalOrderLine(
+                natural_line_key="northwind:freight-high:1",
+                product_id=1,
+                product_name="Cheap Item",
+                quantity=1,
+                unit_price=Decimal("100.00"),
+                discount_rate=Decimal("0.00"),
+            )
+        ],
+    )
+
+    exceptions = run_business_rules(order)
+
+    assert len(exceptions) == 1
+    assert exceptions[0].reason_code == "FREIGHT_TOO_HIGH_VS_ITEMS"

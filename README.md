@@ -69,3 +69,16 @@ Decisiones:
 ## Supuestos:
 - Las órdenes con inconsistencias de negocio no se persisten como confirmadas; se envían a la cola de excepciones.
 - Northwind contiene fechas en formatos date y datetime. El modelo canónico conserva solo la fecha porque el dominio pedido es Orden/Línea y no requiere granularidad horaria.
+- Se considera anomalía revisable cuando el flete supera el 50% del total neto de ítems. No implica corrupción de datos, pero se expone como excepción operacional porque Northwind no provee reglas logísticas explícitas.
+
+## Idempotencia y deduplicación
+
+La clave natural de una orden se define como `northwind:{OrderID}`. Para cada orden normalizada se calcula un `content_hash` SHA-256 a partir del JSON canónico ordenado.
+
+La estrategia es:
+
+- `natural_key` nueva: insertar.
+- `natural_key` existente con mismo `content_hash`: omitir como ya procesada.
+- `natural_key` existente con distinto `content_hash`: actualizar dentro de una transacción o registrar conflicto, según la etapa de persistencia.
+
+Dentro de una misma corrida, el pipeline elimina duplicados exactos y envía a excepciones los duplicados con misma clave natural pero distinto contenido.
